@@ -1,59 +1,31 @@
-// import mongoose from 'mongoose';
-
-// const userSchema = new mongoose.Schema({
-//   name: String,
-//   email: String,
-//   password: String,
-//   role: { type: String, enum: ['admin', 'vendor', 'user'], default: 'user' },
-// });
-
-// // Use `export default` to export the model
-// export default mongoose.model('Service', userSchema);
-
-
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
-const userRegistrationSchema = new mongoose.Schema({
-  userId: { type: Number, unique: true }, // <-- custom ID
 
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true,
-    match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address'],
-  },
+const userRegistrationSchema = new mongoose.Schema({
+  userId:{type:Number},
+  name:  { type: String, required: true, trim: true },
+  email: { type: String, required: true, unique: true, lowercase: true },
+  isEmailVerified: { type: Boolean, default: false },
   password: {
     type: String,
-    required: true,
-    minlength: 6,
+    required: function () { return this.authProvider === 'local'; }
   },
   number: {
     type: String,
-    required: true,
-    match: [/^\d{10}$/, 'Please provide a valid 10-digit phone number'],
+    required: function () { return this.authProvider === 'local'; }
   },
   location: {
     type: String,
-    required: true,
-    trim: true,
+    required: function () { return this.authProvider === 'local'; }
   },
-  role: {
-    type: String,
-    enum: ['admin', 'vendor', 'user'],
-    default: 'user',
-  },
-}, {
-  timestamps: true,
-});
+  otpCode: { type: String },
+  otpExpire: { type: Date },
+  resetPasswordToken: { type: String },
+  resetPasswordExpire: { type: Date },
+  authProvider: { type: String, enum: ['local', 'google'], default: 'local' },
 
+}, { timestamps: true });
 // Pre-save middleware to hash password
 userRegistrationSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
