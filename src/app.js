@@ -3,9 +3,12 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
-import passport from 'passport';
+// import passport from 'passport';
 import './config/passport.js';
 import { adminJs, router as adminRouter } from './admin/admin.config.js';
+import categoryRoutes from './routes/category.routes.js';
+
+
 
 dotenv.config();
 
@@ -22,7 +25,10 @@ app.use((req, res, next) => {
 // AdminJS Route
 app.use(adminJs.options.rootPath, adminRouter);
 app.use('/api/auth', authRoutes);
-app.use(passport.initialize());
+app.use('/api', categoryRoutes);
+
+
+// app.use(passport.initialize());
 
 
 mongoose
@@ -32,4 +38,3 @@ mongoose
 
 // Export the app
 export default app;
-

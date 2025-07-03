@@ -76,10 +76,8 @@ export const register = async (req, res) => {
      if (user.authProvider !== 'local')
        return res.status(400).json({ message: `Use ${user.authProvider} to log in` })
      const ok = await bcrypt.compare(password, user.password);
-     console.log(ok,"okyy")
      if (!ok) return res.status(400).json({ message: 'Wrong password' })
      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    //  res.json({ token });
 res.json({ token, user: user });
    } catch (err) {
      res.status(500).json({ message: 'Server error' });
@@ -256,3 +254,5 @@ export const googleRegister = async (req, res) => {
     user,
   });
 };
+
+
